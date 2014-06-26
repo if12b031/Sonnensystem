@@ -41,9 +41,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\FH-Technikum-wien\4.Semester\Computergrafik\glut-3.7.6-bin;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\FH-Technikum-wien\4.Semester\Computergrafik\glut-3.7.6-bin;$(ReferencePath)</ReferencePath>
-    <LibraryPath>C:\FH-Technikum-wien\4.Semester\Computergrafik\glut-3.7.6-bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -56,6 +56,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalUsingDirectories>C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem\GL;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

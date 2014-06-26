@@ -1,10 +1,9 @@
-// Based on public domain code by Antonio R. Fernandes <ajbrf@yahoo.com>
-
 #define _CRT_SECURE_NO_WARNINGS
-
+// Based on public domain code by Antonio R. Fernandes <ajbrf@yahoo.com>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <GL/tga.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -27,9 +26,6 @@
 #ifndef _WIN32
 #include <stdint.h>
 #endif
-
-
-#include <GL/tga.h>
 
 // this variable is used for image series
 static int savedImages = 0;
@@ -338,4 +334,3 @@ void tgaDestroy(tgaInfo *info) {
 		free(info);
 	}
 }
-
