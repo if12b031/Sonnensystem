@@ -1,4 +1,8 @@
 #include <stdlib.h> // for exit
+#include <stdio.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <GL/tga.h>
 
 #ifdef __APPLE__
 #include <GLUT/glut.h> 
@@ -15,6 +19,7 @@ int window;
 float hour = 0.0;
 float day = 0.0;
 float inc = 1.00;
+GLuint texture;
 
 void resize(int width, int height)
 {
@@ -62,6 +67,9 @@ void display()
 
 	glTranslatef(0.0, 0.0, -8.0);
 
+	//test
+	glutWireSphere(2.0, 30, 30);
+
 	glRotatef(360 * day / 365.0, 0.0, 1.0, 0.0);
 
 	// ecliptic
@@ -70,6 +78,19 @@ void display()
 	// sun
 	glColor3f(1.0, 1.0, 0.0);
 	glutWireSphere(1.0, 15, 15);//glutSolidSphere ausgemalter kreis("kugel")
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glBegin(GL_TRIANGLES);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, -1.0f, 1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 1.0f, 1.0f);
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 
 	// earth
 	// position around the sun
@@ -92,17 +113,68 @@ void display()
 	glutSwapBuffers();
 }
 
+void reportGLError(const char * msg)
+{
+	GLenum errCode;
+	const GLubyte *errString;
+	while ((errCode = glGetError()) != GL_NO_ERROR) {
+		errString = gluErrorString(errCode);
+		fprintf(stderr, "OpenGL Error: %s %s\n", msg, errString);
+	}
+	return;
+}
+
 void init(int width, int height)
 {
+	GLint format;
+	GLsizei w, h;
+	tgaInfo *info = 0;
+	int mode;
+
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_FLAT);
 	resize(width, height);
+
+	info = tgaLoad("Textures/sunmap.tga");
+
+	if (info->status != TGA_OK) {
+		fprintf(stderr, "error loading texture image: %d\n", info->status);
+
+		return;
+	}
+	if (info->width != info->height) {
+		fprintf(stderr, "Image size %d x %d is not rectangular, giving up.\n",
+			info->width, info->height);
+		return;
+	}
+
+	mode = info->pixelDepth / 8;  // will be 3 for rgb, 4 for rgba
+	glGenTextures(1, &texture);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	// Upload the texture bitmap. 
+	w = info->width;
+	h = info->height;
+
+	reportGLError("before uploading texture");
+	format = (mode == 4) ? GL_RGBA : GL_RGB;
+	glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format,
+		GL_UNSIGNED_BYTE, info->imageData);
+	reportGLError("after uploading texture");
+
+	tgaDestroy(info);
+
 }
-
-
 
 int main(int argc, char **argv)
 {

@@ -86,10 +86,12 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="tga.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SonnenSystem.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="tga.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
