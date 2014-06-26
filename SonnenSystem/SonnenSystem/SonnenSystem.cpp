@@ -25,7 +25,10 @@ float jupiter_day = 0.0;
 float saturn_day = 0.0;
 float uranus_day = 0.0;
 float neptune_day = 0.0;
-float inc = 0.10;
+float inc = 1.0;
+float resume = 1.0;
+float advance = 1.0;
+
 GLuint texture;
 
 void resize(int width, int height)
@@ -43,9 +46,66 @@ void resize(int width, int height)
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (key) {
-	case 27:
+	case 27: // Esc
 		glutDestroyWindow(window);
 		exit(0);
+		break;
+	case'w': // Zoom in
+		advance -= 0.5f;
+		glutPostRedisplay();
+		break;
+	case 'a':
+		break;
+	case 's': // Zoom out
+		advance += 0.5f;
+		glutPostRedisplay();
+		break;
+	case 'd':
+		break;
+	case 'p': // Pause rotations
+		resume = inc;
+		inc = 0.0f;
+		glutPostRedisplay();
+		break;
+	case 'r': // Resume rotations
+		inc = resume;
+		glutPostRedisplay();
+		break;
+	case ' ': // Reset position
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '1': // Jump to Mercury
+		advance = 3.9f;
+		glutPostRedisplay();
+		break;
+	case '2': // Jump to Venus
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '3': // Jump to Earth
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '4': // Jump to Mars
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '5': // Jump to Jupiter
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '6': // Jump to Saturn
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '7': // Jump to Uranus
+		advance = 1.0f;
+		glutPostRedisplay();
+		break;
+	case '8': // Jump to Neptune
+		advance = 1.0f;
+		glutPostRedisplay();
 		break;
 	}
 }
@@ -57,7 +117,7 @@ static void specialKeyPressed(int key, int x, int y)
 		inc *= 1.5;
 		break;
 	case GLUT_KEY_DOWN:
-		inc *= 0.75;
+		inc *= 0.50;
 		break;
 	}
 }
@@ -91,6 +151,7 @@ void display()
 	* Uranus -	51.100 km	>> 0,0034f
 	* Neptune -	49.500 km	>> 0,0033f
 	*/
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
@@ -114,19 +175,22 @@ void display()
 	neptune_day += inc / 24.0;
 	neptune_day = uranus_day - ((int)(neptune_day / 60225)) * 60225;
 
-	glTranslatef(0.0, 0.0, -1.0);
-
+	glTranslatef(0, 0, -advance);
+	glScalef(2.0f, 2.0f, 2.0f);
+	
 	/* Sun */
-	glRotatef(360*earth_day / 365.0, 0.0, 1.0, 0.0);
+	glPushMatrix();
+	glRotatef(360 * earth_day / 365.0, 0.0, 1.0, 0.0);
 	glColor3f(1.0, 1.0, 0.0);
-	glutWireSphere(0.0927f, 15, 15);
+	glutSolidSphere(0.0927f, 30, 30);
+	glPopMatrix();
 
 	/* Mercury - period around sun = 88 days */
 	glPushMatrix();
 	glRotatef(360.0*mercury_day / 88.0f, 0.0, 1.0, 0.0);
 	glTranslatef(3.90f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0003f, 10, 10);
+	glutSolidSphere(0.0003f, 30, 30);
 	glPopMatrix();
 
 	/* Venus - period around sun = 225 days */
@@ -134,7 +198,7 @@ void display()
 	glRotatef(360.0*venus_day / 225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(7.20f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0008f, 10, 10);
+	glutSolidSphere(0.0008f, 30, 30);
 	glPopMatrix();
 
 	/* Earth and Moon - period around sun = 365 days */
@@ -146,13 +210,13 @@ void display()
 	glPushMatrix();
 	glRotatef(360.0*earth_hour / 24.0f, 0.0, 1.0, 0.0);
 	glColor3f(1.0, 1.0, 1.0);
-	glutWireSphere(0.0009f, 10, 10);
+	glutSolidSphere(0.0009f, 30, 30);
 	glPopMatrix();
 	// Moon
 	glRotatef(360.0 * 4 * earth_day / 365.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.003f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0002f, 10, 10);
+	glutSolidSphere(0.0002f, 10, 10);
 	glPopMatrix();
 
 	/* Mars - period around sun = 687 days */
@@ -160,7 +224,7 @@ void display()
 	glRotatef(360.0*mars_day / 687.0f, 0.0, 1.0, 0.0);
 	glTranslatef(15.2f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0005f, 10, 10);
+	glutSolidSphere(0.0005f, 20, 20);
 	glPopMatrix();
 
 	/* Jupiter - period around sun = 4380 days (12 years)*/
@@ -168,7 +232,7 @@ void display()
 	glRotatef(360.0*jupiter_day / 4380.0f, 0.0, 1.0, 0.0);
 	glTranslatef(52.04f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0095f, 10, 10);
+	glutSolidSphere(0.0095f, 30, 30);
 	glPopMatrix();
 
 	/* Saturn - period around sun = 10585 days (29 years)*/
@@ -176,7 +240,7 @@ void display()
 	glRotatef(360.0*saturn_day / 10585.0f, 0.0, 1.0, 0.0);
 	glTranslatef(95.4f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0080f, 10, 10);
+	glutSolidSphere(0.0080f, 30, 30);
 	glPopMatrix();
 
 	/* Uranus - period around sun = 30660 days (84 years)*/
@@ -184,7 +248,7 @@ void display()
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
 	glTranslatef(191.8f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0034f, 10, 10);
+	glutSolidSphere(0.0034f, 30, 30);
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
@@ -192,7 +256,7 @@ void display()
 	glRotatef(360.0*neptune_day / 60225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(300.6f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutWireSphere(0.0033f, 10, 10);
+	glutSolidSphere(0.0033f, 30, 30);
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -209,6 +273,12 @@ void reportGLError(const char * msg)
 	return;
 }
 
+void timer(int value)
+{
+	glutPostRedisplay();
+	glutTimerFunc(60, timer, 1);
+}
+
 void init(int width, int height)
 {
 	GLint format;
@@ -216,11 +286,22 @@ void init(int width, int height)
 	tgaInfo *info = 0;
 	int mode;
 
+	// Specify a global ambient
+	GLfloat globalAmbient[] = { 0.5, 0.5, 0.5, 1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+
+	GLfloat mat_specular[] = { 0.2, 0.2, 0.2, 1.0 };
+	GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_DEPTH_TEST);
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 	resize(width, height);
 
 	info = tgaLoad("Textures/sunmap.tga");
@@ -269,10 +350,10 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(0, 0);
 	window = glutCreateWindow("Sonnensystem");
 	glutDisplayFunc(&display);
-	glutIdleFunc(&display);
 	glutReshapeFunc(&resize);
 	glutKeyboardFunc(&keyPressed);
 	glutSpecialFunc(&specialKeyPressed);
+	glutTimerFunc(60, timer, 1);
 	init(640, 480);
 	glutFullScreen();
 	glutMainLoop();
