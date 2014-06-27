@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 ﻿Der Buildvorgang wurde am 27.06.2014 17:03:17 gestartet.
      1>Projekt "C:\FH-Technikum-wien\4.Semester\Computergrafik\Project\SonnenSystem\SonnenSystem\SonnenSystem.vcxproj" auf Knoten "2", Build Ziel(e).
+=======
+﻿Build started 27.06.2014 17:04:47.
+     1>Project "C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem\SonnenSystem.vcxproj" on node 2 (Build target(s)).
+>>>>>>> a75c752bd2dfcd6ccc17733ec70a3099915a1f16
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem\GL" /AI"C:\Users\Georg\Documents\FH Technikum\4. Semester\Repositories\CGE\SonnenSystem\SonnenSystem\GL" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt SonnenSystem.cpp
          SonnenSystem.cpp
@@ -12,4 +17,8 @@
 
 Build erfolgreich.
 
+<<<<<<< HEAD
 Verstrichene Zeit 00:00:00.49
+=======
+Time Elapsed 00:00:00.44
+>>>>>>> a75c752bd2dfcd6ccc17733ec70a3099915a1f16
