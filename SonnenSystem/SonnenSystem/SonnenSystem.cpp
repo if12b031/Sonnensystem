@@ -30,6 +30,7 @@ float resume = 1.0;
 float advance = 1.0;
 
 GLuint texture;
+GLUquadricObj *sunSphere;
 
 void resize(int width, int height)
 {
@@ -161,6 +162,8 @@ void display()
 	*/
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -198,7 +201,7 @@ void display()
 	glPushMatrix();
 	glRotatef(360 * earth_day / 365.0, 0.0, 1.0, 0.0);
 	glColor3f(1.0, 1.0, 1.0);
-	glutSolidSphere(0.0927f, 30, 30);
+	gluSphere(sunSphere,0.0927f, 30, 30);
 	glPopMatrix();
 
 	/* Mercury - period around sun = 88 days */
@@ -310,7 +313,10 @@ void init(int width, int height)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_COLOR_MATERIAL);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
 	resize(width, height);
+	
 
 	info = tgaLoad("Textures/sunmap.tga");
 
@@ -319,11 +325,11 @@ void init(int width, int height)
 
 		return;
 	}
-	if (info->width != info->height) {
+	/*if (info->width != info->height) {
 		fprintf(stderr, "Image size %d x %d is not rectangular, giving up.\n",
 			info->width, info->height);
 		return;
-	}
+	}*/
 
 	mode = info->pixelDepth / 8;  // will be 3 for rgb, 4 for rgba
 	glGenTextures(1, &texture);
@@ -332,8 +338,6 @@ void init(int width, int height)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
 	// Upload the texture bitmap. 
@@ -348,6 +352,13 @@ void init(int width, int height)
 
 	tgaDestroy(info);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	sunSphere = gluNewQuadric();
+	gluQuadricDrawStyle(sunSphere, GLU_FILL);
+	gluQuadricTexture(sunSphere, GL_TRUE);
+	gluQuadricNormals(sunSphere, GLU_SMOOTH);
 }
 
 int main(int argc, char **argv)
