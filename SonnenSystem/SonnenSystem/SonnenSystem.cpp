@@ -77,22 +77,14 @@ void keyPressed(unsigned char key, int x, int y)
 		glutDestroyWindow(window);
 		exit(0);
 		break;
-<<<<<<< HEAD
-	case'w': // Move forward
-		deltaMove = 0.5f;
-=======
 	case 'w': // Move forward
 		deltaMove = 0.01f;
->>>>>>> a53bc754ccfd580156293d3da6f7c2fc5c0e535a
 		glutPostRedisplay();
 		break;
 	case 's': // Move back
-		deltaMove = -0.5f;
+		deltaMove = -0.01f;
 		glutPostRedisplay();
 		break;
-<<<<<<< HEAD
-	case 'e': // Scale up
-=======
 	case 'W': // Move fast forward
 		deltaMove = 0.5f;;
 		glutPostRedisplay();
@@ -102,7 +94,6 @@ void keyPressed(unsigned char key, int x, int y)
 		glutPostRedisplay();
 		break;
 	case 'e': // Scalue up
->>>>>>> a53bc754ccfd580156293d3da6f7c2fc5c0e535a
 		scale += 0.5f;
 		glutPostRedisplay();
 		break;
@@ -413,7 +404,7 @@ void display()
 	glPushMatrix();
 	setTexture(mercuryInfo);
 	glRotatef(360.0*mercury_day / 88.0f, 0.0, 1.0, 0.0);
-	glTranslatef(0.39f, 0.0f, 0.0f);
+	glTranslatef(0.0f, 0.0f, 0.39f);
 	gluSphere(sphere, 0.0003f, 30, 30);//0.0003f
 	glPopMatrix();
 
@@ -421,7 +412,7 @@ void display()
 	glPushMatrix();
 	setTexture(venusInfo);
 	glRotatef(360.0*venus_day / 225.0f, 0.0, 1.0, 0.0);
-	glTranslatef(0.72f, 0.0f, 0.0f);
+	glTranslatef(0.0f, 0.0f, 0.72f);
 	gluSphere(sphere, 0.0008f, 30, 30);//0.0008f
 	glPopMatrix();
 
@@ -448,16 +439,16 @@ void display()
 	glPushMatrix();
 	setTexture(marsInfo);
 	glRotatef(360.0*mars_day / 687.0f, 0.0, 1.0, 0.0);
+	glTranslatef(0.0f, 0.0f, 1.52f);
 	gluSphere(sphere, 0.0005f, 20, 20);//0.0005f
-	Translatef(0.0f, 0.0f, 1.52f);
 	glPopMatrix();
 
 	/* Jupiter - period around sun = 4380 days (12 years)*/
 	glPushMatrix();
 	setTexture(jupiterInfo);
 	glRotatef(360.0*jupiter_day / 4380.0f, 0.0, 1.0, 0.0);
-	gluSphere(sphere, 0.0095f, 30, 30);//0.0095f
 	glTranslatef(0.0f, 0.0f, 5.2f);
+	gluSphere(sphere, 0.0095f, 30, 30);//0.0095f
 	glPopMatrix();
 
 	/* Saturn - period around sun = 10585 days (29 years)*/
@@ -473,16 +464,16 @@ void display()
 	glPushMatrix();
 	setTexture(uranusInfo);
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
-	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
 	glTranslatef(0.0f, 0.0f, 19.08f);
+	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
 	glPushMatrix();
 	setTexture(neptuneInfo);
 	glRotatef(360.0*neptune_day / 60225.0f, 0.0, 1.0, 0.0);
-	gluSphere(sphere, 0.0033f, 30, 30);//0.0033f
 	glTranslatef(0.0f, 0.0f, 30.06f);
+	gluSphere(sphere, 0.0033f, 30, 30);//0.0033f
 	glPopMatrix();
 
 	glutSwapBuffers();
