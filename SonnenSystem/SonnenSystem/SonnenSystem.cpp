@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #define RAD(x) (((x)*M_PI)/180.)
 #define _USE_MATH_DEFINES
 #include <GL/tga.h>
@@ -46,7 +47,8 @@ float deltaMove = 0.0f; // Indicates wheather user is moving
 float lx = 1.0f, lz = 0.0f; // Actual vector representing the camera's direction
 float x = 0.0f, z = 1.0f; // XZ position of the camera
 GLuint texture;
-GLUquadricObj *sunSphere;
+GLUquadricObj *sphere;
+tgaInfo *sunInfo, *moonInfo, *mercuryInfo, *venusInfo, *earthInfo, *jupiterInfo, *saturnInfo, *uranusInfo, *marsInfo, *neptuneInfo;
 
 void resize(int width, int height)
 {
@@ -68,14 +70,14 @@ void keyPressed(unsigned char key, int x, int y)
 		exit(0);
 		break;
 	case'w': // Move forward
-		deltaMove = 0.01f;
+		deltaMove = 0.5f;
 		glutPostRedisplay();
 		break;
 	case 's': // Move back
-		deltaMove = -0.01f;
+		deltaMove = -0.5f;
 		glutPostRedisplay();
 		break;
-	case 'e': // Scalue up
+	case 'e': // Scale up
 		scale += 0.5f;
 		glutPostRedisplay();
 		break;
@@ -204,6 +206,62 @@ void computePos(float deltaMove) {
 	z += deltaMove * lz * 0.1f;
 }
 
+void reportGLError(const char * msg)
+{
+	GLenum errCode;
+	const GLubyte *errString;
+	while ((errCode = glGetError()) != GL_NO_ERROR) {
+		errString = gluErrorString(errCode);
+		fprintf(stderr, "OpenGL Error: %s %s\n", msg, errString);
+	}
+	return;
+}
+
+tgaInfo* loadTexture(char* tgaFile){
+
+	
+	tgaInfo *info = 0;
+	info = tgaLoad(tgaFile);
+
+	if (info->status != TGA_OK) {
+		fprintf(stderr, "error loading texture image: %d\n", info->status);
+
+		return info;
+	}
+	/*if (info->width != info->height) {
+	fprintf(stderr, "Image size %d x %d is not rectangular, giving up.\n",
+	info->width, info->height);
+	return;
+	}*/
+	glGenTextures(1, &texture);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	return info;
+}
+
+void setTexture(tgaInfo *info){
+	GLint format;
+	GLsizei w, h;
+	int mode;
+
+	mode = info->pixelDepth / 8;  // will be 3 for rgb, 4 for rgba
+
+	// Upload the texture bitmap. 
+	w = info->width;
+	h = info->height;
+	format = (mode == 4) ? GL_RGBA : GL_RGB;
+	glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format,
+		GL_UNSIGNED_BYTE, info->imageData);
+}
+
 void display()
 {
 	/*
@@ -241,8 +299,6 @@ void display()
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -280,25 +336,25 @@ void display()
 
 	/* Sun */
 	glPushMatrix();
+	setTexture(sunInfo);
 	glRotatef(360 * earth_day / 365.0, 0.0, 1.0, 0.0);
-	glColor3f(1.0, 1.0, 1.0);
-	gluSphere(sunSphere,0.0927f, 30, 30);
+	gluSphere(sphere,0.0927f, 30, 30);
 	glPopMatrix();
 
 	/* Mercury - period around sun = 88 days */
 	glPushMatrix();
+	setTexture(mercuryInfo);
 	glRotatef(360.0*mercury_day / 88.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.39f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0003f, 30, 30);
+	gluSphere(sphere, 0.0003f, 30, 30);//0.0003f
 	glPopMatrix();
 
 	/* Venus - period around sun = 225 days */
 	glPushMatrix();
+	setTexture(venusInfo);
 	glRotatef(360.0*venus_day / 225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.72f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0008f, 30, 30);
+	gluSphere(sphere, 0.0008f, 30, 30);//0.0008f
 	glPopMatrix();
 
 	/* Earth and Moon - period around sun = 365 days */
@@ -306,71 +362,62 @@ void display()
 	glPushMatrix();
 	glRotatef(360.0*earth_day / 365.0f, 0.0, 1.0, 0.0);
 	glTranslatef(1.0f, 0.0, 0.0);
+	// Earth
 	// Rotate the earth on its axis
 	glPushMatrix();
+	setTexture(earthInfo);
 	glRotatef(360.0*earth_hour / 24.0f, 0.0, 1.0, 0.0);
-	glColor3f(1.0, 1.0, 1.0);
-	glutSolidSphere(0.0009f, 30, 30);
+	gluSphere(sphere, 0.0009f, 30, 30);//0.0009f
 	glPopMatrix();
 	// Moon
+	setTexture(moonInfo);
 	glRotatef(360.0 * 4 * earth_day / 365.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.003f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0002f, 10, 10);
+	gluSphere(sphere, 0.0002f, 10, 10);//0.0002f
 	glPopMatrix();
 
 	/* Mars - period around sun = 687 days */
 	glPushMatrix();
+	setTexture(marsInfo);
 	glRotatef(360.0*mars_day / 687.0f, 0.0, 1.0, 0.0);
 	glTranslatef(1.52f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0005f, 20, 20);
+	gluSphere(sphere, 0.0005f, 20, 20);//0.0005f
 	glPopMatrix();
 
 	/* Jupiter - period around sun = 4380 days (12 years)*/
 	glPushMatrix();
+	setTexture(jupiterInfo);
 	glRotatef(360.0*jupiter_day / 4380.0f, 0.0, 1.0, 0.0);
 	glTranslatef(5.2f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0095f, 30, 30);
+	gluSphere(sphere, 0.0095f, 30, 30);//0.0095f
 	glPopMatrix();
 
 	/* Saturn - period around sun = 10585 days (29 years)*/
 	glPushMatrix();
+	setTexture(saturnInfo);
 	glRotatef(360.0*saturn_day / 10585.0f, 0.0, 1.0, 0.0);
 	glTranslatef(9.54f, 0.0f, 0.0f);
 	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0080f, 30, 30);
+	gluSphere(sphere, 0.0080f, 30, 30);//0.0080f
 	glPopMatrix();
 
 	/* Uranus - period around sun = 30660 days (84 years)*/
 	glPushMatrix();
+	setTexture(uranusInfo);
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
 	glTranslatef(19.08f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0034f, 30, 30);
+	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
 	glPushMatrix();
+	setTexture(neptuneInfo);
 	glRotatef(360.0*neptune_day / 60225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(30.06f, 0.0f, 0.0f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	glutSolidSphere(0.0033f, 30, 30);
+	gluSphere(sphere, 0.0033f, 30, 30);//0.0033f
 	glPopMatrix();
 
 	glutSwapBuffers();
-}
-
-void reportGLError(const char * msg)
-{
-	GLenum errCode;
-	const GLubyte *errString;
-	while ((errCode = glGetError()) != GL_NO_ERROR) {
-		errString = gluErrorString(errCode);
-		fprintf(stderr, "OpenGL Error: %s %s\n", msg, errString);
-	}
-	return;
 }
 
 void timer(int value)
@@ -381,11 +428,6 @@ void timer(int value)
 
 void init(int width, int height)
 {
-	GLint format;
-	GLsizei w, h;
-	tgaInfo *info = 0;
-	int mode;
-
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0);
 	glDepthFunc(GL_LESS);
@@ -397,49 +439,22 @@ void init(int width, int height)
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_2D);
 	resize(width, height);
-	
 
-	info = tgaLoad("Textures/sunmap.tga");
+	sunInfo = loadTexture("Textures/sunmap.tga");
+	earthInfo = loadTexture("Textures/earthmap.tga");
+	moonInfo = loadTexture("Textures/moonmap.tga");
+	mercuryInfo = loadTexture("Textures/mercurymap.tga"); 
+	venusInfo = loadTexture("Textures/venusmap.tga");
+	jupiterInfo = loadTexture("Textures/jupitermap.tga");
+	neptuneInfo = loadTexture("Textures/neptunemap.tga");
+	uranusInfo = loadTexture("Textures/uranusmap.tga");
+	saturnInfo = loadTexture("Textures/saturnmap.tga");
+	marsInfo = loadTexture("Textures/marsmap.tga");
 
-	if (info->status != TGA_OK) {
-		fprintf(stderr, "error loading texture image: %d\n", info->status);
-
-		return;
-	}
-	/*if (info->width != info->height) {
-		fprintf(stderr, "Image size %d x %d is not rectangular, giving up.\n",
-			info->width, info->height);
-		return;
-	}*/
-
-	mode = info->pixelDepth / 8;  // will be 3 for rgb, 4 for rgba
-	glGenTextures(1, &texture);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-
-	// Upload the texture bitmap. 
-	w = info->width;
-	h = info->height;
-
-	reportGLError("before uploading texture");
-	format = (mode == 4) ? GL_RGBA : GL_RGB;
-	glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format,
-		GL_UNSIGNED_BYTE, info->imageData);
-	reportGLError("after uploading texture");
-
-	tgaDestroy(info);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	sunSphere = gluNewQuadric();
-	gluQuadricDrawStyle(sunSphere, GLU_FILL);
-	gluQuadricTexture(sunSphere, GL_TRUE);
-	gluQuadricNormals(sunSphere, GLU_SMOOTH);
+	sphere = gluNewQuadric();
+	gluQuadricDrawStyle(sphere, GLU_FILL);
+	gluQuadricTexture(sphere, GL_TRUE);
+	gluQuadricNormals(sphere, GLU_SMOOTH);
 }
 
 int main(int argc, char **argv)
