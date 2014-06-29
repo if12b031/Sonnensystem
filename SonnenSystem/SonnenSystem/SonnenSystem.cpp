@@ -37,15 +37,17 @@ float jupiter_day = 0.0;
 float saturn_day = 0.0;
 float uranus_day = 0.0;
 float neptune_day = 0.0;
-float inc = 1.0;
+float inc = 0.0;
 float resume = 1.0;
 float scale = 2.0;
+int started = 0; // User has started animation
+/* Camera movement taken from http://www.lighthouse3d.com/tutorials/glut-tutorial/ */
 int begin_x = -1; // X value of mouse movement
-GLfloat angle_x = 0;  // Angle of spin around x axis of scene
+GLfloat angle_x = -2.68f;  // Angle of spin around x axis of scene
 float deltaAngle_x = 0.0f; // Difference between old x and new x
 float deltaMove = 0.0f; // Indicates wheather user is moving
-float lx = 1.0f, lz = 0.0f; // Actual vector representing the camera's direction
-float x = 0.0f, z = 1.0f; // XZ position of the camera
+float lx = -0.5f, lz = 1.0f; // Actual vector representing the camera's direction
+float x = 0.5f, z = -0.2f; // XZ position of the camera
 GLuint texture;
 GLUquadricObj *sphere;
 tgaInfo *sunInfo, *moonInfo, *mercuryInfo, *venusInfo, *earthInfo, *jupiterInfo, *saturnInfo, *uranusInfo, *marsInfo, *neptuneInfo;
@@ -58,26 +60,49 @@ void resize(int width, int height)
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
+	gluPerspective(45.0f, (float)width / (float)height, 0.001f, 100.0f);
 	glMatrixMode(GL_MODELVIEW);
 }
 
 void keyPressed(unsigned char key, int x, int y)
 {
 	switch (key) {
-	case 27: // Esc
+	case 13: // Enter - Start animation
+		if (inc < 0.9f) {
+			inc = 1.0f;
+			started = 1;
+		}
+		break;
+	case 27: // Esc - Close program
 		glutDestroyWindow(window);
 		exit(0);
 		break;
+<<<<<<< HEAD
 	case'w': // Move forward
 		deltaMove = 0.5f;
+=======
+	case 'w': // Move forward
+		deltaMove = 0.01f;
+>>>>>>> a53bc754ccfd580156293d3da6f7c2fc5c0e535a
 		glutPostRedisplay();
 		break;
 	case 's': // Move back
 		deltaMove = -0.5f;
 		glutPostRedisplay();
 		break;
+<<<<<<< HEAD
 	case 'e': // Scale up
+=======
+	case 'W': // Move fast forward
+		deltaMove = 0.5f;;
+		glutPostRedisplay();
+		break;
+	case 'S': // Move fast back
+		deltaMove = -0.5f;;
+		glutPostRedisplay();
+		break;
+	case 'e': // Scalue up
+>>>>>>> a53bc754ccfd580156293d3da6f7c2fc5c0e535a
 		scale += 0.5f;
 		glutPostRedisplay();
 		break;
@@ -98,14 +123,10 @@ void keyPressed(unsigned char key, int x, int y)
 		inc = resume;
 		glutPostRedisplay();
 		break;
-	case ' ': // Reset everything
-		x = 0.0;
-		z = 1.0;
-		lx = 0.0;
-		lz = 0.0;
-		deltaAngle_x = 0.0f;
-		deltaMove = 0.0f;
-		inc = 1.0;
+	case ' ': // Reset planets
+		if (started) {
+			inc = 1.0;
+		}
 		resume = 1.0;
 		scale = 2.0;
 		mercury_day = 0.0;
@@ -119,35 +140,83 @@ void keyPressed(unsigned char key, int x, int y)
 		neptune_day = 0.0;
 		glutPostRedisplay();
 		break;
-	case '1': // Jump to Mercury
-		glutPostRedisplay();
-		break;
-	case '2': // Jump to Venus
-		glutPostRedisplay();
-		break;
-	case '3': // Jump to Earth
-		glutPostRedisplay();
-		break;
-	case '4': // Jump to Mars
-		glutPostRedisplay();
-		break;
-	case '5': // Jump to Jupiter
-		glutPostRedisplay();
-		break;
-	case '6': // Jump to Saturn
-		glutPostRedisplay();
-		break;
-	case '7': // Jump to Uranus
-		glutPostRedisplay();
-		break;
-	case '8': // Jump to Neptune
-		glutPostRedisplay();
-		break;
 	case '+': // Speed up
 		inc *= 1.5;
 		break;
 	case '-': // Speed down
 		inc *= 0.5;
+		break;
+	case '0': // Jump to Sun
+		x = 0.5f;
+		z = -0.2f;
+		lx = -0.5f;
+		lz = 1.0f;
+		angle_x = -2.68f;
+		glutPostRedisplay();
+		break;
+	case '1': // Jump to Mercury
+		x = 0.3f;
+		z = 0.39f;
+		lx = -1.0f;
+		lz = 0.6f;
+		angle_x = -2.11f;
+		glutPostRedisplay();
+		break;
+	case '2': // Jump to Venus
+		x = 0.3f;
+		z = 1.0f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '3': // Jump to Earth
+		x = 0.3f;
+		z = 1.5f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '4': // Jump to Mars
+		x = 0.3f;
+		z = 2.5f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '5': // Jump to Jupiter
+		x = 0.3f;
+		z = 9.8f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '6': // Jump to Saturn
+		x = 0.3f;
+		z = 18.5f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '7': // Jump to Uranus
+		x = 0.3f;
+		z = 37.5f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
+		break;
+	case '8': // Jump to Neptune
+		x = 0.3f;
+		z = 59.5f;
+		lx = -1.0f;
+		lz = 1.0f;
+		angle_x = -2.36f;
+		glutPostRedisplay();
 		break;
 	}
 }
@@ -159,19 +228,16 @@ void keyReleased(unsigned char key, int x, int y)
 		break;
 	case 's': deltaMove = 0; 
 		break;
+	case 'W': deltaMove = 0;
+		break;
+	case 'S': deltaMove = 0;
+		break;
 	}
 }
 
 static void specialKeyPressed(int key, int x, int y)
 {
-	/*switch (key) {
-	case GLUT_KEY_UP:
-		inc *= 1.5;
-		break;
-	case GLUT_KEY_DOWN:
-		inc *= 0.50;
-		break;
-	}*/
+
 }
 
 void mouse(int button, int state, int x, int y)
@@ -191,7 +257,7 @@ void mouse(int button, int state, int x, int y)
 
 void mouseMotion(int x, int y) {
 
-	if (begin_x >= 0) {
+	if (begin_x > 0) {
 		// Update deltaAngle
 		deltaAngle_x = (x - begin_x) * 0.01f;
 		// Update camera's direction
@@ -294,10 +360,6 @@ void display()
 	* Neptune -	49.500 km	>> 0,0033f
 	*/
 
-	if (deltaMove) {
-		computePos(deltaMove);
-	}
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -329,10 +391,16 @@ void display()
 	neptune_day += inc / 24.0;
 	neptune_day = uranus_day - ((int)(neptune_day / 60225)) * 60225;
 
-	glScalef(scale, scale, scale);
+	/* Update X and Z if user is moving */
+	if (deltaMove) {
+		computePos(deltaMove);
+	}
+
 	gluLookAt(x, 0.0f, z,
 		x + lx, 0.0f, z + lz,
 		0.0f, 1.0f, 0.0f);
+
+	glScalef(scale, scale, scale);
 
 	/* Sun */
 	glPushMatrix();
@@ -361,8 +429,8 @@ void display()
 	// Position around the sun
 	glPushMatrix();
 	glRotatef(360.0*earth_day / 365.0f, 0.0, 1.0, 0.0);
-	glTranslatef(1.0f, 0.0, 0.0);
 	// Earth
+	glTranslatef(0.0, 0.0, 1.0f);
 	// Rotate the earth on its axis
 	glPushMatrix();
 	setTexture(earthInfo);
@@ -372,31 +440,31 @@ void display()
 	// Moon
 	setTexture(moonInfo);
 	glRotatef(360.0 * 4 * earth_day / 365.0f, 0.0, 1.0, 0.0);
-	glTranslatef(0.003f, 0.0f, 0.0f);
 	gluSphere(sphere, 0.0002f, 10, 10);//0.0002f
+	glTranslatef(0.0f, 0.0f, 0.003f);
 	glPopMatrix();
 
 	/* Mars - period around sun = 687 days */
 	glPushMatrix();
 	setTexture(marsInfo);
 	glRotatef(360.0*mars_day / 687.0f, 0.0, 1.0, 0.0);
-	glTranslatef(1.52f, 0.0f, 0.0f);
 	gluSphere(sphere, 0.0005f, 20, 20);//0.0005f
+	Translatef(0.0f, 0.0f, 1.52f);
 	glPopMatrix();
 
 	/* Jupiter - period around sun = 4380 days (12 years)*/
 	glPushMatrix();
 	setTexture(jupiterInfo);
 	glRotatef(360.0*jupiter_day / 4380.0f, 0.0, 1.0, 0.0);
-	glTranslatef(5.2f, 0.0f, 0.0f);
 	gluSphere(sphere, 0.0095f, 30, 30);//0.0095f
+	glTranslatef(0.0f, 0.0f, 5.2f);
 	glPopMatrix();
 
 	/* Saturn - period around sun = 10585 days (29 years)*/
 	glPushMatrix();
 	setTexture(saturnInfo);
 	glRotatef(360.0*saturn_day / 10585.0f, 0.0, 1.0, 0.0);
-	glTranslatef(9.54f, 0.0f, 0.0f);
+	glTranslatef(0.0f, 0.0f, 9.54f);
 	glColor3f(0.3f, 0.7f, 0.3f);
 	gluSphere(sphere, 0.0080f, 30, 30);//0.0080f
 	glPopMatrix();
@@ -405,16 +473,16 @@ void display()
 	glPushMatrix();
 	setTexture(uranusInfo);
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
-	glTranslatef(19.08f, 0.0f, 0.0f);
 	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
+	glTranslatef(0.0f, 0.0f, 19.08f);
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
 	glPushMatrix();
 	setTexture(neptuneInfo);
 	glRotatef(360.0*neptune_day / 60225.0f, 0.0, 1.0, 0.0);
-	glTranslatef(30.06f, 0.0f, 0.0f);
 	gluSphere(sphere, 0.0033f, 30, 30);//0.0033f
+	glTranslatef(0.0f, 0.0f, 30.06f);
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -472,6 +540,7 @@ int main(int argc, char **argv)
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseMotion);
 	glutTimerFunc(60, timer, 1);
+	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 	init(640, 480);
 	glutFullScreen();
 	glutMainLoop();
