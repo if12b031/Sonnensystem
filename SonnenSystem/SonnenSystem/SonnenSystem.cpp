@@ -50,7 +50,8 @@ float lx = -0.5f, lz = 1.0f; // Actual vector representing the camera's directio
 float x = 0.5f, z = -0.2f; // XZ position of the camera
 GLuint texture;
 GLUquadricObj *sphere;
-tgaInfo *sunInfo, *moonInfo, *mercuryInfo, *venusInfo, *earthInfo, *jupiterInfo, *saturnInfo, *uranusInfo, *marsInfo, *neptuneInfo;
+tgaInfo *sunInfo, *moonInfo, *mercuryInfo, *venusInfo, *earthInfo, *jupiterInfo, *saturnInfo;
+tgaInfo *uranusInfo, *marsInfo, *neptuneInfo, *saturnRingInfo, *uranusRingInfo;
 
 void resize(int width, int height)
 {
@@ -86,7 +87,7 @@ void keyPressed(unsigned char key, int x, int y)
 		glutPostRedisplay();
 		break;
 	case 'W': // Move fast forward
-		deltaMove = 0.5f;;
+		deltaMove = 2.5f;;
 		glutPostRedisplay();
 		break;
 	case 'S': // Move fast back
@@ -458,6 +459,10 @@ void display()
 	glTranslatef(0.0f, 0.0f, 9.54f);
 	glColor3f(0.3f, 0.7f, 0.3f);
 	gluSphere(sphere, 0.0080f, 30, 30);//0.0080f
+	//Saturn-ring
+	setTexture(saturnRingInfo);
+	glRotatef(90, 1.0, 0.0, -0.2);
+	gluDisk(sphere, 0.0120f, 0.0168f, 30, 30);
 	glPopMatrix();
 
 	/* Uranus - period around sun = 30660 days (84 years)*/
@@ -466,6 +471,11 @@ void display()
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 19.08f);
 	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
+	//Uranus-ring
+	setTexture(uranusRingInfo);
+	glRotatef(90, 1.0, 0.0, -0.2);
+	gluDisk(sphere, 0.0051f, 0.0072f, 30, 30);
+	glPopMatrix();
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
@@ -509,6 +519,8 @@ void init(int width, int height)
 	uranusInfo = loadTexture("Textures/uranusmap.tga");
 	saturnInfo = loadTexture("Textures/saturnmap.tga");
 	marsInfo = loadTexture("Textures/marsmap.tga");
+	saturnRingInfo = loadTexture("Textures/saturnringmap.tga");
+	uranusRingInfo = loadTexture("Textures/uranusrinmap.tga");
 
 	sphere = gluNewQuadric();
 	gluQuadricDrawStyle(sphere, GLU_FILL);
