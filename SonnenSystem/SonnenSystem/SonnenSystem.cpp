@@ -43,10 +43,10 @@ float scale = 2.0;
 int started = 0; // User has started animation
 /* Camera movement taken from http://www.lighthouse3d.com/tutorials/glut-tutorial/ */
 int begin_x = -1; // X value of mouse movement
-GLfloat angle_x = -2.68f;  // Angle of spin around x axis of scene
+GLfloat angle_x = -2.5f;  // Angle of spin around x axis of scene
 float deltaAngle_x = 0.0f; // Difference between old x and new x
 float deltaMove = 0.0f; // Indicates wheather user is moving
-float lx = -0.5f, lz = 1.0f; // Actual vector representing the camera's direction
+float lx = -0.75f, lz = 1.0f; // Actual vector representing the camera's direction
 float x = 0.5f, z = -0.2f; // XZ position of the camera
 GLuint texture;
 GLUquadricObj *sphere;
@@ -87,11 +87,11 @@ void keyPressed(unsigned char key, int x, int y)
 		glutPostRedisplay();
 		break;
 	case 'W': // Move fast forward
-		deltaMove = 2.5f;;
+		deltaMove = 0.6f;;
 		glutPostRedisplay();
 		break;
 	case 'S': // Move fast back
-		deltaMove = -0.5f;;
+		deltaMove = -0.6f;
 		glutPostRedisplay();
 		break;
 	case 'e': // Scalue up
@@ -141,9 +141,9 @@ void keyPressed(unsigned char key, int x, int y)
 	case '0': // Jump to Sun
 		x = 0.5f;
 		z = -0.2f;
-		lx = -0.5f;
+		lx = -0.75f;
 		lz = 1.0f;
-		angle_x = -2.68f;
+		angle_x = -2.5f;
 		glutPostRedisplay();
 		break;
 	case '1': // Jump to Mercury
@@ -354,15 +354,36 @@ void display()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_color);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	GLfloat material_color[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, material_color);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glColor4f(1.0, 1.0, 1.0, 1.0); // reset gl color
+	// Set camera.
+	gluLookAt(x, 0.0f, z,
+		x + lx, 0.0f, z + lz,
+		0.0f, 1.0f, 0.0f);
 
+	// Light.
+	GLfloat light_diffuse[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_specular[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_position[] = { 0.0, 0.0, -1.0, 0.0 };
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	// Materials.
+	GLfloat material_diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
+	GLfloat material_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	GLfloat material_specular[] = { 0.0, 0.0, 0.0, 1.0f };
+	GLfloat material_shininess[] = { 4.0, 4.0, 4.0, 1.0 };
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, material_diffuse);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, material_ambient);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, material_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, material_shininess);
+
+	// Specify a global ambient
+	GLfloat globalAmbient[] = { 0.2, 0.2, 0.2, 1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+	
 	/* Compute position values for each planet */
 	earth_hour += inc;
 	earth_hour = earth_hour - ((int)(earth_hour / 24)) * 24;
@@ -387,26 +408,28 @@ void display()
 	if (deltaMove) {
 		computePos(deltaMove);
 	}
-
-	gluLookAt(x, 0.0f, z,
-		x + lx, 0.0f, z + lz,
-		0.0f, 1.0f, 0.0f);
-
 	glScalef(scale, scale, scale);
 
 	/* Sun */
 	glPushMatrix();
 	setTexture(sunInfo);
 	glRotatef(360 * earth_day / 365.0, 0.0, 1.0, 0.0);
-	gluSphere(sphere,0.0927f, 30, 30);
+	gluSphere(sphere, 0.0927f, 100, 100);
 	glPopMatrix();
+
+	GLfloat light_diffuse2[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_ambient2[] = { 0.0f, 0.0f, 0.0f, 1.0 };
+	GLfloat light_specular2[] = { 1.0, 1.0, 1.0, 1.0 };
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse2);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient2);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular2);
 
 	/* Mercury - period around sun = 88 days */
 	glPushMatrix();
 	setTexture(mercuryInfo);
 	glRotatef(360.0*mercury_day / 88.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 0.39f);
-	gluSphere(sphere, 0.0003f, 30, 30);//0.0003f
+	gluSphere(sphere, 0.0003f, 50, 50); //0.0003f
 	glPopMatrix();
 
 	/* Venus - period around sun = 225 days */
@@ -414,7 +437,7 @@ void display()
 	setTexture(venusInfo);
 	glRotatef(360.0*venus_day / 225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 0.72f);
-	gluSphere(sphere, 0.0008f, 30, 30);//0.0008f
+	gluSphere(sphere, 0.0008f, 70, 70); //0.0008f
 	glPopMatrix();
 
 	/* Earth and Moon - period around sun = 365 days */
@@ -427,13 +450,13 @@ void display()
 	glPushMatrix();
 	setTexture(earthInfo);
 	glRotatef(360.0*earth_hour / 24.0f, 0.0, 1.0, 0.0);
-	gluSphere(sphere, 0.0009f, 30, 30);//0.0009f
+	gluSphere(sphere, 0.0009f, 70, 70); //0.0009f
 	glPopMatrix();
 	// Moon
 	setTexture(moonInfo);
-	glRotatef(360.0 * 4 * earth_day / 365.0f, 0.0, 1.0, 0.0);
-	gluSphere(sphere, 0.0002f, 10, 10);//0.0002f
 	glTranslatef(0.0f, 0.0f, 0.003f);
+	glRotatef(360.0 * 4 * earth_day / 365.0f, 0.0, 1.0, 0.0);
+	gluSphere(sphere, 0.0002f, 50, 50); //0.0002f
 	glPopMatrix();
 
 	/* Mars - period around sun = 687 days */
@@ -441,7 +464,7 @@ void display()
 	setTexture(marsInfo);
 	glRotatef(360.0*mars_day / 687.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 1.52f);
-	gluSphere(sphere, 0.0005f, 20, 20);//0.0005f
+	gluSphere(sphere, 0.0005f, 70, 70); //0.0005f
 	glPopMatrix();
 
 	/* Jupiter - period around sun = 4380 days (12 years)*/
@@ -449,7 +472,7 @@ void display()
 	setTexture(jupiterInfo);
 	glRotatef(360.0*jupiter_day / 4380.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 5.2f);
-	gluSphere(sphere, 0.0095f, 30, 30);//0.0095f
+	gluSphere(sphere, 0.0095f, 70, 70); //0.0095f
 	glPopMatrix();
 
 	/* Saturn - period around sun = 10585 days (29 years)*/
@@ -457,12 +480,11 @@ void display()
 	setTexture(saturnInfo);
 	glRotatef(360.0*saturn_day / 10585.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 9.54f);
-	glColor3f(0.3f, 0.7f, 0.3f);
-	gluSphere(sphere, 0.0080f, 30, 30);//0.0080f
-	//Saturn-ring
+	gluSphere(sphere, 0.0080f, 70, 70); //0.0080f
+	// Saturn ring
 	setTexture(saturnRingInfo);
 	glRotatef(90, 1.0, 0.0, -0.2);
-	gluDisk(sphere, 0.0120f, 0.0168f, 30, 30);
+	gluDisk(sphere, 0.0120f, 0.0168f, 50, 50);
 	glPopMatrix();
 
 	/* Uranus - period around sun = 30660 days (84 years)*/
@@ -470,12 +492,11 @@ void display()
 	setTexture(uranusInfo);
 	glRotatef(360.0*uranus_day / 30660.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 19.08f);
-	gluSphere(sphere, 0.0034f, 30, 30);//0.0034f
-	//Uranus-ring
+	gluSphere(sphere, 0.0034f, 70, 70); //0.0034f
+	// Uranus ring
 	setTexture(uranusRingInfo);
 	glRotatef(90, 1.0, 0.0, -0.2);
-	gluDisk(sphere, 0.0051f, 0.0072f, 30, 30);
-	glPopMatrix();
+	gluDisk(sphere, 0.0051f, 0.0072f, 70, 70);
 	glPopMatrix();
 
 	/* Neptune - period around sun = 60225 days (165 years)*/
@@ -483,7 +504,7 @@ void display()
 	setTexture(neptuneInfo);
 	glRotatef(360.0*neptune_day / 60225.0f, 0.0, 1.0, 0.0);
 	glTranslatef(0.0f, 0.0f, 30.06f);
-	gluSphere(sphere, 0.0033f, 30, 30);//0.0033f
+	gluSphere(sphere, 0.0033f, 70, 70);  //0.0033f
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -504,9 +525,10 @@ void init(int width, int height)
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	glEnable(GL_COLOR_MATERIAL);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_NORMALIZE);
 	resize(width, height);
 
 	sunInfo = loadTexture("Textures/sunmap.tga");
@@ -535,6 +557,10 @@ int main(int argc, char **argv)
 	glutInitWindowSize(640, 480);
 	glutInitWindowPosition(0, 0);
 	window = glutCreateWindow("Sonnensystem");
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 	glutDisplayFunc(&display);
 	glutReshapeFunc(&resize);
 	glutKeyboardFunc(&keyPressed);

@@ -42,7 +42,7 @@ swap_16bit_word(uint16_t *word)
 }
 #endif
 
-// load the image header fields. We only keep those that matter!
+/* Load the image header fields. We only keep those that matter! */
 void tgaLoadHeader(FILE *file, tgaInfo *info) {
 
 	unsigned char cGarbage;
@@ -68,9 +68,9 @@ void tgaLoadHeader(FILE *file, tgaInfo *info) {
 	// FIXME: Determine byte order at runtime.
 	swap_16bit_word((uint16_t*)&info->width);
 	swap_16bit_word((uint16_t*)&info->height);
-#endif // __APPLE__
+#endif
 
-#if 0 // debug
+#if 0 // Debug
 	printf("Image dimensions: %d %d %d\n",
 		info->width, info->height, info->pixelDepth);
 #endif
@@ -78,8 +78,9 @@ void tgaLoadHeader(FILE *file, tgaInfo *info) {
 	fread(&cGarbage, sizeof(unsigned char), 1, file);
 }
 
-// loads the image pixels. You shouldn't call this function
-// directly
+/* Loads the image pixels. You shouldn't call this function
+*  directly.
+*/
 void tgaLoadImageData(FILE *file, tgaInfo *info) {
 
 	int mode, total, i;
@@ -100,20 +101,21 @@ void tgaLoadImageData(FILE *file, tgaInfo *info) {
 	// stores it as BGR(A) so we'll have to swap R and B.
 	if (mode >= 3)
 		for (i = 0; i < total; i += mode) {
-#if 1 // original code
-		aux = info->imageData[i];
-		info->imageData[i] = info->imageData[i + 2];
-		info->imageData[i + 2] = aux;
-#else // somehow I had a texture file which was RBG (!) 
-		aux = info->imageData[i + 1];
-		info->imageData[i + 1] = info->imageData[i + 2];
-		info->imageData[i + 2] = aux;
-#endif
+			#if 1 // original code
+					aux = info->imageData[i];
+					info->imageData[i] = info->imageData[i + 2];
+					info->imageData[i + 2] = aux;
+			#else // somehow I had a texture file which was RBG (!) 
+					aux = info->imageData[i + 1];
+					info->imageData[i + 1] = info->imageData[i + 2];
+					info->imageData[i + 2] = aux;
+			#endif
 		}
 }
 
-// this is the function to call when we want to load
-// an image
+/* This is the function to call when we want to load
+*  an image.
+*/
 tgaInfo * tgaLoad(char *filename) {
 
 	FILE *file;
@@ -162,7 +164,6 @@ tgaInfo * tgaLoad(char *filename) {
 		return(info);
 	}
 #endif
-
 	// mode equals the number of image components
 	mode = info->pixelDepth / 8;
 	// total is the number of bytes to read
@@ -191,7 +192,7 @@ tgaInfo * tgaLoad(char *filename) {
 	return(info);
 }
 
-// converts RGB to greyscale
+/* Converts RGB to greyscale. */
 void tgaRGBtoGreyscale(tgaInfo *info) {
 
 	int mode, i, j;
@@ -229,7 +230,7 @@ void tgaRGBtoGreyscale(tgaInfo *info) {
 	info->imageData = newImageData;
 }
 
-// takes a screen shot and saves it to a TGA image
+/* Takes a screen shot and saves it to a TGA image. */
 int tgaGrabScreenSeries(char *filename, int x, int y, int w, int h) {
 
 	unsigned char *imageData;
@@ -244,7 +245,7 @@ int tgaGrabScreenSeries(char *filename, int x, int y, int w, int h) {
 	return(tgaSaveSeries(filename, w, h, 32, imageData));
 }
 
-// saves an array of pixels as a TGA image
+/* saves an array of pixels as a TGA image. */
 int tgaSave(char            *filename,
 	short int        width,
 	short int        height,
@@ -304,7 +305,7 @@ int tgaSave(char            *filename,
 	return(TGA_OK);
 }
 
-// saves a series of files with names "filenameX.tga"
+/* saves a series of files with names "filenameX.tga". */
 int tgaSaveSeries(char        *filename,
 	short int        width,
 	short int        height,
@@ -314,7 +315,6 @@ int tgaSaveSeries(char        *filename,
 	char *newFilename;
 	int status;
 	// compute the new filename by adding the series number and the extension
-
 	newFilename = (char *)malloc(sizeof(char) * strlen(filename) + 8);
 
 	sprintf(newFilename, "%s%d.tga", filename, savedImages);
@@ -326,7 +326,7 @@ int tgaSaveSeries(char        *filename,
 }
 
 
-// releases the memory used for the image
+/* Releases the memory used for the image. */
 void tgaDestroy(tgaInfo *info) {
 
 	if (info != NULL) {
